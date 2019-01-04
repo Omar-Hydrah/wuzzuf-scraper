@@ -19,15 +19,16 @@ class Sql():
 	def createTable(self):
 		query = """create table if not exists jobs
 			(id integer primary key autoincrement, 
-			category text, job text, salary text, company text, url text)"""
+			category text, job text, salary text, company text, 
+			location text, url text)"""
 		self.cursor.execute(query)
 		self.connection.commit()
 
 	def insertJob(self, job):
-		query = """insert into jobs(category, job, salary, company, url) 
-			values(?, ?, ?, ?, ?)"""
+		query = """insert into jobs(category, job, salary, company, url, location) 
+			values(?, ?, ?, ?, ?, ?)"""
 		self.cursor.execute(query, (job.category, job.job, job.salary, 
-			job.company, job.url))
+			job.company, job.url, job.location))
 		self.connection.commit()
 
 
