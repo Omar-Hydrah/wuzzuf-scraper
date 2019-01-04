@@ -20,7 +20,7 @@ class Scraper:
 		self.getJobCount()
 
 	# Get all the job lists from all pages
-	def scanFullJobList(self):
+	def searchForKeyword(self):
 		for i in range(0, self.totalPages + 1):
 			self.currentPage = i
 			self.updatePayloadCurrentPage()
@@ -32,11 +32,13 @@ class Scraper:
 		if self.sql == None:
 			raise Exception("Sql object is required to save jobs")
 
+		job = self.getJob(job)
 		self.sql.insertJob(job)
+		# print(job)
 
 	def saveJobList(self, jobList):
 		for job in jobList:
-			saveJob(job)
+			self.saveJob(job)
 
 	def getJob(self, job):
 		
@@ -62,24 +64,20 @@ class Scraper:
 			jobTitle = jobItem.get_text().strip() 
 			job = Job(self.keyword, jobTitle, None, None, jobUrl)
 			counter = counter + 1
-			print(str(counter) + " " + jobTitle)
+			# print(str(counter) + " " + jobTitle)
 			# scanJob(job)
 			jobs.append(job)
 
 		# Advance to next page
 		self.currentPage = self.currentPage + 1
 		self.updatePayloadCurrentPage()
-		print("self.payload[start]: " + str(self.payload["start"]))
-		print("self.jobCount: " + str(self.jobCount))
+		# print("self.payload[start]: " + str(self.payload["start"]))
+		# print("self.jobCount: " + str(self.jobCount))
+		print("currentPage: " + self.currentPage)
 
 		return jobs
 
 
-
-	def calculateTotalPages(self):
-		self.totalPages = math.ceil(int(self.jobCount) / 20)
-		# self.totalPages = 2
-	
 	def getJobCount(self):
 		response = requests.get(self.baseUrl, self.payload)
 		soup     = Soup(response.content, "html.parser")
@@ -88,6 +86,10 @@ class Scraper:
 		self.calculateTotalPages()
 		print("totalPages: " + str(self.totalPages))
 
+	def calculateTotalPages(self):
+		self.totalPages = math.ceil(int(self.jobCount) / 20)
+		# self.totalPages = 1
+	
 
 	def updatePayloadCurrentPage(self):
 		self.payload["start"] = self.currentPage * 10
