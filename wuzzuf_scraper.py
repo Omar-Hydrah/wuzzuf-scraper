@@ -18,38 +18,15 @@ def main(argv):
 	args = parser.parse_args()
 
 	keyword = args.keyword  
-	# baseUrl = "https://wuzzuf.net/search/jobs/?q="
-	# url     = baseUrl + keyword
-
-	# soup    = getJobListSoup(url)
-	# jobList = getJobListFromSoup(soup)
 
 	sql = Sql(keyword)
 	sql.open()
 	sql.createTable()
 
 	scraper = Scraper(keyword)
+	scraper.sql = sql
 	print("Total count: " +  str(scraper.jobCount))
-	jobs = scraper.getJobList()
-	for job in jobs:
-		# print(job)
-		# print(job.title)
-		# print(job.url)
-		pass
-
-	# for jobItem in jobList:
-	# 	# print(jobItem.get_text().strip())
-	# 	# print(jobItem.find("a").get("href"))
-	# 	title = jobItem.get_text().strip()
-	# 	url  = jobItem.find("a").get("href")
-
-	# 	jobSoup = getJobSoup(url)
-	# 	salary  = getJobSalary(jobSoup)
-	# 	job = Job(keyword, title, salary, None, url)
-
-	# 	sql.insertJob(job)
-	# 	print(title)
-
+	scraper.searchForKeyword()
 
 	print("Finished downloading")
 
