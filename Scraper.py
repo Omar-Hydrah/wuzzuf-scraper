@@ -44,8 +44,11 @@ class Scraper:
 		soup       = Soup(response.content, "html.parser")
 		salaryInfo = soup.find("dl", {"class": "salary-info"})
 		salary     = salaryInfo.find("dd").get_text().strip()
+		location   = soup.find("span", 
+			{"class": "job-company-location"}).get_text()
 
-		job.salary = salary
+		job.salary   = salary
+		job.location = location
 		return job
 
 	def getJobList(self):
