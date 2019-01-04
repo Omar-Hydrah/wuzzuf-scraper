@@ -16,13 +16,8 @@ class Scraper:
 	def __init__(self, keyword):
 		self.keyword          = keyword
 		self.payload["q"]     = keyword
-		# self.payload["start"] = self.currentPage * 10
 		self.updatePayloadCurrentPage()
 		self.getJobCount()
-		# Scan first page to get total count of jobs
-		# Get the totalPages count
-		# Scan every page get with getJobList()
-		# Save every job on the list with saveJob() 
 
 	# Get all the job lists from all pages
 	def scanFullJobList(self):
@@ -45,15 +40,6 @@ class Scraper:
 
 	def getJob(self, job):
 		
-		# title = jobItem.get_text().strip()
-		# url  = jobItem.find("a").get("href")
-
-		# jobSoup = getJobSoup(url)
-		# salary  = getJobSalary(jobSoup)
-		# job = Job(keyword, title, salary, None, url)
-
-		# sql.insertJob(job)
-		# print(title)
 		response   = requests.get(job.url)
 		soup       = Soup(response.content, "html.parser")
 		salaryInfo = soup.find("dl", {"class": "salary-info"})
@@ -80,23 +66,22 @@ class Scraper:
 		# Advance to next page
 		self.currentPage = self.currentPage + 1
 		self.updatePayloadCurrentPage()
-		print("Payload-Start: " + str(self.payload["start"]))
+		print("self.payload[start]: " + str(self.payload["start"]))
+		print("self.jobCount: " + str(self.jobCount))
 
 		return jobs
 
 
 
 	def calculateTotalPages(self):
-		# self.totalPages = self.jobCount / 20
-		self.totalPages = 2
+		self.totalPages = math.ceil(int(self.jobCount) / 20)
+		# self.totalPages = 2
 	
 	def getJobCount(self):
 		response = requests.get(self.baseUrl, self.payload)
 		soup     = Soup(response.content, "html.parser")
 		count    = soup.find("span", {"class": "search-jobs-count"}).get_text()
 		self.jobCount = int(count)
-		# print(type(count))
-		# print(count)
 		self.calculateTotalPages()
 		print("totalPages: " + str(self.totalPages))
 
