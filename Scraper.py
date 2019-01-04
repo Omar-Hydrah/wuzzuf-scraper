@@ -3,6 +3,7 @@ import math
 from bs4 import BeautifulSoup as Soup
 from Job import Job
 from Sql import Sql
+from multiprocessing import Pool
 
 class Scraper:
 	keyword     = ""
@@ -27,6 +28,17 @@ class Scraper:
 			jobs = self.getJobList()
 			self.saveJobList(jobs)
 
+	def searchForKeywordWithPool(self):
+		for i in range(self.totalPages + 1):
+			self.currentPage = i
+			self.updatePayloadCurrentPage()
+			jobs = self.getJobList()
+
+			p1 = Pool(10)
+			p2 = Pool(10)
+			p1.map(self.saveJob, jobs[0 :10])
+			p2.map(self.saveJob, jobs[10:20])
+
 
 	def saveJob(self, job):
 		if self.sql == None:
@@ -40,6 +52,7 @@ class Scraper:
 		for job in jobList:
 			self.saveJob(job)
 
+
 	def getJob(self, job):
 		
 		response   = requests.get(job.url)
@@ -47,7 +60,7 @@ class Scraper:
 		salaryInfo = soup.find("dl", {"class": "salary-info"})
 		salary     = salaryInfo.find("dd").get_text().strip()
 		location   = soup.find("span", 
-			{"class": "job-company-location"}).get_text()
+			{"class": "job-company-location"}).get_text().strip()
 
 		job.salary   = salary
 		job.location = location
@@ -73,7 +86,7 @@ class Scraper:
 		self.updatePayloadCurrentPage()
 		# print("self.payload[start]: " + str(self.payload["start"]))
 		# print("self.jobCount: " + str(self.jobCount))
-		print("currentPage: " + self.currentPage)
+		print("currentPage: " + str(self.currentPage))
 
 		return jobs
 
